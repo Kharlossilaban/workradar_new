@@ -5,23 +5,24 @@ import 'package:workradar/features/auth/register/register_page.dart';
 import 'package:workradar/features/auth/login/login_provider.dart';
 import 'package:workradar/utils/theme.dart';
 import 'package:workradar/widgets/or_divider.dart';
-import 'package:workradar/forgetpassword/forgetpassword_page.dart';
+import 'package:workradar/features/auth/forgetpassword/forgetpassword_page.dart';
 import 'package:workradar/features/auth/login/login_google_page.dart';
+
+// updated import: navigate to DashboardPage after login
+import 'package:workradar/features/dashboard/dashboard_page.dart';
 
 class LoginPage extends StatelessWidget {
   const LoginPage({super.key});
 
-  // METHOD: open register page
   void _openRegister(BuildContext context) {
-    FocusScope.of(context).unfocus(); // tutup keyboard jika terbuka
+    FocusScope.of(context).unfocus();
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (_) => const RegisterPage()));
   }
 
-  // METHOD: open reset password page
   void _openReset(BuildContext context) {
-    FocusScope.of(context).unfocus(); // tutup keyboard bila terbuka
+    FocusScope.of(context).unfocus();
     Navigator.of(
       context,
     ).push(MaterialPageRoute(builder: (_) => const ResetPasswordPage()));
@@ -151,13 +152,49 @@ class LoginPage extends StatelessWidget {
                             ),
                           ),
                           const SizedBox(height: 6),
+
+                          // Login button (perubahan: capture navigator/messenger/provider BEFORE await)
                           SizedBox(
                             width: double.infinity,
                             height: 50,
                             child: ElevatedButton(
                               onPressed: provider.isLoading
                                   ? null
-                                  : () => context.read<LoginProvider>().login(),
+                                  : () async {
+                                      FocusScope.of(context).unfocus();
+
+                                      // capture context-dependent objects BEFORE awaiting
+                                      final navigator = Navigator.of(context);
+                                      final messenger = ScaffoldMessenger.of(
+                                        context,
+                                      );
+                                      final loginProv = context
+                                          .read<LoginProvider>();
+
+                                      // call login (async)
+                                      await loginProv.login();
+
+                                      // baca hasil dari provider (menggunakan instance yang sudah di-capture)
+                                      final success = loginProv.isAuthenticated;
+
+                                      if (success) {
+                                        // navigate to DashboardPage
+                                        navigator.pushReplacement(
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                const DashboardPage(),
+                                          ),
+                                        );
+                                      } else {
+                                        messenger.showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Login gagal — periksa email/password',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: primary,
                                 shape: RoundedRectangleBorder(
@@ -183,9 +220,11 @@ class LoginPage extends StatelessWidget {
                                     ),
                             ),
                           ),
+
                           const SizedBox(height: 18),
                           const OrDivider(),
                           const SizedBox(height: 18),
+
                           SizedBox(
                             height: 52,
                             child: OutlinedButton(
@@ -193,10 +232,17 @@ class LoginPage extends StatelessWidget {
                                 FocusScope.of(context).unfocus();
                                 Navigator.of(context).push(
                                   MaterialPageRoute(
-                                    builder: (_) => LoginGooglePage(),
+                                    builder: (_) => const LoginGooglePage(),
                                   ),
                                 );
                               },
+                              style: OutlinedButton.styleFrom(
+                                side: BorderSide(color: Colors.grey.shade300),
+                                backgroundColor: Colors.grey[100],
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -222,6 +268,7 @@ class LoginPage extends StatelessWidget {
                           ),
                         ],
                       ),
+
                       const Spacer(),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 8.0),

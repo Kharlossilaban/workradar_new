@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:workradar/utils/theme.dart';
 
 // IMPORT: halaman tujuan setelah verifikasi OTP
-import 'package:workradar/forgetpassword/resetpassword_page.dart';
+import 'package:workradar/features/auth/forgetpassword/forgetpassword_page.dart';
 
 class VerifyOtpPage extends StatefulWidget {
   const VerifyOtpPage({super.key});

@@ -2,7 +2,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:workradar/features/auth/login/login_provider.dart';
-import 'package:workradar/utils/theme.dart';
 import 'package:workradar/features/auth/register/register_kodeotp.dart';
 
 class RegisterPage extends StatelessWidget {
@@ -51,7 +50,6 @@ class RegisterPage extends StatelessWidget {
       context,
     ); // gunakan provider yang sama jika controller ada di sini
     final primary = const Color.fromRGBO(36, 161, 156, 100);
-    final link = AppTheme.linkBlue;
 
     return Scaffold(
       backgroundColor: Colors.white,
