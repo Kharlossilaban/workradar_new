@@ -1,11 +1,47 @@
+// dashboard_widgets.dart
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 const Color kPrimaryTeal = Color(0xFF3ECFC7);
 const Color kPrimaryTealDark = Color(0xFF1E8E86);
 const double _kHorizontalPadding = 16.0;
 
-/// FilterChipsRow — sekarang scrollable horizontal dan aman untuk banyak chip.
+/// Enum kategori tugas
+enum TaskCategory { semua, kerja, pribadi, ulangTahun }
+
+/// Simple model mapping kategori -> asset & teks.
+class CategoryInfo {
+  final String assetPath;
+  final String title;
+  final String subtitle;
+  CategoryInfo(this.assetPath, this.title, this.subtitle);
+}
+
+final Map<TaskCategory, CategoryInfo> kCategoryInfo = {
+  TaskCategory.semua: CategoryInfo(
+    'assets/semua.jpg',
+    'Semua Tugas',
+    'Klik tombol + untuk menambahkan tugas baru di kategori ini.',
+  ),
+  TaskCategory.kerja: CategoryInfo(
+    'assets/kerja.jpg',
+    'Tugas Kerja',
+    'Organisasikan tugas kerja di sini.',
+  ),
+  TaskCategory.pribadi: CategoryInfo(
+    'assets/pribadi.jpg',
+    'Tugas Pribadi',
+    'Catat hal-hal pribadi yang harus dilakukan.',
+  ),
+  TaskCategory.ulangTahun: CategoryInfo(
+    'assets/ulang_tahun.jpg',
+    'Ulang Tahun',
+    'Pengingat acara & hadiah ulang tahun.',
+  ),
+};
+
+/// FilterChipsRow — scrollable horizontal chips untuk memilih kategori.
 class FilterChipsRow extends StatelessWidget {
   final int selectedIndex;
   final void Function(int) onSelected;
@@ -54,7 +90,6 @@ class FilterChipsRow extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: _kHorizontalPadding),
       child: Row(
         children: [
-          // area chip bisa discroll horizontal — ambil ruang sisa dengan Expanded
           Expanded(
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
@@ -73,18 +108,12 @@ class FilterChipsRow extends StatelessWidget {
                     selectedIndex == 3,
                     () => onSelected(3),
                   ),
-                  // tambahan chip contoh:
-                  // _buildChip('Proyek', selectedIndex == 4, () => onSelected(4)),
                 ],
               ),
             ),
           ),
-
-          // icon menu tetap di ujung kanan
           IconButton(
-            onPressed: () {
-              // implement kalau perlu
-            },
+            onPressed: () {},
             icon: const Icon(Icons.more_vert, color: Colors.black87),
           ),
         ],
@@ -93,7 +122,8 @@ class FilterChipsRow extends StatelessWidget {
   }
 }
 
-/// Bubble pesan dengan tail kecil
+/// SpeechBubble — petunjuk kecil dekat tombol tambah.
+/// NOTE: not const because it uses runtime colors/shade.
 class SpeechBubble extends StatelessWidget {
   final String text;
   final double maxWidth;
@@ -144,7 +174,64 @@ class SpeechBubble extends StatelessWidget {
   }
 }
 
-/// Bottom navigation simplified
+/// CenterImagePage — area tengah yang berubah sesuai kategori
+class CenterImagePage extends StatelessWidget {
+  final TaskCategory category;
+  const CenterImagePage({super.key, required this.category});
+
+  @override
+  Widget build(BuildContext context) {
+    final info = kCategoryInfo[category]!;
+
+    return AnimatedSwitcher(
+      duration: const Duration(milliseconds: 300),
+      switchInCurve: Curves.easeOutCubic,
+      switchOutCurve: Curves.easeInCubic,
+      child: Center(
+        key: ValueKey(category),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              info.assetPath,
+              width: 200,
+              height: 200,
+              fit: BoxFit.contain,
+              errorBuilder: (context, error, stackTrace) {
+                debugPrint('GAGAL memuat asset: ${info.assetPath} -> $error');
+                return Icon(
+                  Icons.image_not_supported,
+                  size: 84,
+                  color: Colors.grey.shade400,
+                );
+              },
+            ),
+            const SizedBox(height: 18),
+            Text(
+              info.title,
+              style: const TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
+                color: Colors.black87,
+              ),
+            ),
+            const SizedBox(height: 6),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 40.0),
+              child: Text(
+                info.subtitle,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.black54, fontSize: 13),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+/// CustomBottomNav — bottom navigation sederhana.
 class CustomBottomNav extends StatelessWidget {
   final int currentIndex;
   final void Function(int) onTap;
@@ -157,24 +244,73 @@ class CustomBottomNav extends StatelessWidget {
 
   Widget _navItem(
     BuildContext context,
-    int index,
-    IconData icon, {
+    int index, {
+    IconData? icon,
     String? assetName,
   }) {
     final color = index == currentIndex
         ? kPrimaryTealDark
         : Colors.grey.shade400;
+
+    Widget iconWidget;
+    if (assetName != null) {
+      if (assetName.toLowerCase().endsWith('.svg')) {
+        iconWidget = SvgPicture.asset(
+          assetName,
+          width: 22,
+          height: 22,
+          colorFilter: ColorFilter.mode(color, BlendMode.srcIn),
+        );
+      } else {
+        iconWidget = Image.asset(
+          assetName,
+          width: 22,
+          height: 22,
+          color: color,
+        );
+      }
+    } else {
+      iconWidget = Icon(icon ?? Icons.help_outline, color: color);
+    }
+
     return Expanded(
       child: GestureDetector(
-        onTap: () => onTap(index),
+        onTap: () {
+          // panggil callback asli (misalnya untuk mengganti selected index)
+          onTap(index);
+
+          // debug: cek bahwa klik terdeteksi
+          debugPrint('nav item tapped: $index');
+
+          // jika ikon kalender (index 1) -> buka halaman kalender
+          // 1) Prefer: gunakan named route '/calendar' yang sudah kita daftarkan di main.dart
+          if (index == 1) {
+            try {
+              Navigator.pushNamed(context, '/calendar');
+            } catch (e) {
+              debugPrint('Gagal navigasi ke /calendar via named route: $e');
+              // 2) Fallback: push langsung ke CalendarPage (aktifkan import CalendarPage & CalendarProvider di atas file)
+              // Jika kamu belum menambahkan route '/calendar' di main.dart, uncomment blok di bawah ini:
+              /*
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => ChangeNotifierProvider(
+                  create: (_) => CalendarProvider(),
+                  child: const CalendarPage(),
+                ),
+              ),
+            );
+            */
+            }
+          }
+        },
         child: SizedBox(
           height: 56,
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              assetName == null
-                  ? Icon(icon, color: color)
-                  : Image.asset(assetName, width: 22, height: 22, color: color),
+              iconWidget,
               if (index == currentIndex)
                 Container(
                   margin: const EdgeInsets.only(top: 6),
@@ -212,10 +348,11 @@ class CustomBottomNav extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          _navItem(context, 0, Icons.home_rounded),
-          _navItem(context, 1, Icons.calendar_today_outlined),
-          _navItem(context, 2, Icons.emoji_events_outlined),
-          _navItem(context, 3, Icons.person_outline),
+          // contoh pemakaian: pakai SVG (assetName) atau icon bawaan
+          _navItem(context, 0, assetName: 'assets/icons/home.svg'),
+          _navItem(context, 1, assetName: 'assets/icons/calendar.svg'),
+          _navItem(context, 2, assetName: 'assets/icons/vip.svg'),
+          _navItem(context, 3, assetName: 'assets/icons/profile.svg'),
         ],
       ),
     );

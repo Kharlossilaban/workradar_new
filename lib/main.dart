@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 
 // providers
 import 'package:workradar/features/auth/login/login_provider.dart';
+import 'package:workradar/features/tasks/providers/calendar_provider.dart';
 // jika nanti kamu ingin TasksProvider global, uncomment:
 // import 'package:workradar/features/tasks/providers/tasks_provider.dart';
 
@@ -11,6 +12,7 @@ import 'package:workradar/features/auth/login/login_provider.dart';
 import 'package:workradar/features/auth/login/login_page.dart';
 import 'package:workradar/features/auth/register/register_page.dart';
 import 'package:workradar/features/auth/forgetpassword/forgetpassword_page.dart';
+import 'package:workradar/features/tasks/pages/calendar_page.dart';
 
 // tambah import TasksPage supaya bisa dipakai di routes atau saat testing
 import 'package:workradar/features/tasks/pages/tasks_page.dart';
@@ -23,6 +25,7 @@ void main() {
     MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => LoginProvider()),
+        ChangeNotifierProvider(create: (_) => CalendarProvider()),
         // jika nanti menggunakan provider untuk tasks secara global:
         // ChangeNotifierProvider(create: (_) => TasksProvider()),
       ],
@@ -46,6 +49,7 @@ class MyApp extends StatelessWidget {
         '/reset': (context) => const ResetPasswordPage(),
         // optional: named route for TasksPage (handy)
         '/tasks': (context) => const TasksPage(),
+        '/calendar': (context) => const CalendarPage(),
       },
     );
   }
