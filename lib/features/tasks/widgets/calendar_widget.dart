@@ -1,7 +1,4 @@
-// widget.dart
-// Kumpulan widget kecil yang dipakai page: header kalender, event card, dan styling constants.
-// Taruh file ini di: lib/features/tasks/widgets/calendar_widgets.dart
-
+// lib/features/tasks/widgets/calendar_widgets.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:workradar/features/tasks/providers/calendar_provider.dart';
@@ -12,61 +9,63 @@ const Color kTextPrimary = Color(0xFF0F1724);
 const Color kTextSecondary = Color(0xFF6B7280);
 const Color kDivider = Color(0xFFE5E7EB);
 
-// Header custom: left = bulan tahun, center = prev/next, right = arrow up
+/// CalendarHeader -- kept minimal; vertical toggle is handled in page
 class CalendarHeader extends StatelessWidget {
   final DateTime focused;
-  final VoidCallback onPrev;
-  final VoidCallback onNext;
-  final VoidCallback onToggle;
+  final VoidCallback? onPrev;
+  final VoidCallback? onNext;
+  final VoidCallback? onToggle;
 
   const CalendarHeader({
     super.key,
     required this.focused,
-    required this.onPrev,
-    required this.onNext,
-    required this.onToggle,
+    this.onPrev,
+    this.onNext,
+    this.onToggle,
   });
 
   @override
   Widget build(BuildContext context) {
-    final monthLabel = DateFormat.yMMMM('id_ID').format(focused);
+    // kept compact in case other pages use it; otherwise header is in page
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4),
       child: Row(
         children: [
-          Text(
-            monthLabel,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              color: kPrimary,
+          IconButton(onPressed: onPrev, icon: const Icon(Icons.chevron_left)),
+          Expanded(
+            child: Center(
+              child: Text(
+                DateFormat.yMMMM('id_ID').format(focused),
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
             ),
           ),
-          const Spacer(),
-          Row(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.chevron_left),
-                onPressed: onPrev,
-              ),
-              IconButton(
-                icon: const Icon(Icons.chevron_right),
-                onPressed: onNext,
-              ),
-            ],
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.keyboard_arrow_up),
-            onPressed: onToggle,
-          ),
+          IconButton(onPressed: onNext, icon: const Icon(Icons.chevron_right)),
         ],
       ),
     );
   }
 }
 
-// EventCard sesuai spesifikasi: checkbox circle (toggle), title, divider, meta row
+/// Weekday label widget (public, const constructor so it can used in const lists)
+class WeekDayLabel extends StatelessWidget {
+  final String label;
+  const WeekDayLabel({required this.label, super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Center(
+        child: Text(
+          label,
+          style: const TextStyle(fontSize: 12, color: kTextSecondary),
+        ),
+      ),
+    );
+  }
+}
+
+/// EventCard sesuai spesifikasi: checkbox circle (toggle), title, divider, meta row
 class EventCard extends StatelessWidget {
   final Event event;
   final DateTime day;

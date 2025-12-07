@@ -41,7 +41,7 @@ class _VerifyOtpPageState extends State<VerifyOtpPage> {
 
     setState(() => _isLoading = true);
     try {
-      // TODO: ganti dengan verifikasi OTP ke backend jika ada
+      // TOO: ganti dengan verifikasi OTP ke backend jika ada
       await Future.delayed(const Duration(seconds: 1));
 
       if (!mounted) return;

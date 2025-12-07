@@ -65,7 +65,7 @@ class FilterChipsRow extends StatelessWidget {
           boxShadow: active
               ? [
                   BoxShadow(
-                    color: kPrimaryTeal.withOpacity(0.14),
+                    color: kPrimaryTeal.withValues(alpha: 0.14),
                     blurRadius: 6,
                     offset: const Offset(0, 2),
                   ),
@@ -276,34 +276,9 @@ class CustomBottomNav extends StatelessWidget {
     return Expanded(
       child: GestureDetector(
         onTap: () {
-          // panggil callback asli (misalnya untuk mengganti selected index)
           onTap(index);
-
-          // debug: cek bahwa klik terdeteksi
           debugPrint('nav item tapped: $index');
-
-          // jika ikon kalender (index 1) -> buka halaman kalender
-          // 1) Prefer: gunakan named route '/calendar' yang sudah kita daftarkan di main.dart
-          if (index == 1) {
-            try {
-              Navigator.pushNamed(context, '/calendar');
-            } catch (e) {
-              debugPrint('Gagal navigasi ke /calendar via named route: $e');
-              // 2) Fallback: push langsung ke CalendarPage (aktifkan import CalendarPage & CalendarProvider di atas file)
-              // Jika kamu belum menambahkan route '/calendar' di main.dart, uncomment blok di bawah ini:
-              /*
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => ChangeNotifierProvider(
-                  create: (_) => CalendarProvider(),
-                  child: const CalendarPage(),
-                ),
-              ),
-            );
-            */
-            }
-          }
+          // HAPUS Navigator.pushNamed — navigasi sekarang dikendalikan oleh parent
         },
         child: SizedBox(
           height: 56,
@@ -339,7 +314,7 @@ class CustomBottomNav extends StatelessWidget {
         color: Colors.white,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, -2),
           ),

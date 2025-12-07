@@ -4,6 +4,8 @@ import 'package:provider/provider.dart';
 
 // providers
 import 'package:workradar/features/auth/login/login_provider.dart';
+import 'package:workradar/features/profil/profile_page.dart';
+import 'package:workradar/features/profil/profile_provider.dart';
 import 'package:workradar/features/tasks/providers/calendar_provider.dart';
 // jika nanti kamu ingin TasksProvider global, uncomment:
 // import 'package:workradar/features/tasks/providers/tasks_provider.dart';
@@ -26,6 +28,7 @@ void main() {
       providers: [
         ChangeNotifierProvider(create: (_) => LoginProvider()),
         ChangeNotifierProvider(create: (_) => CalendarProvider()),
+        ChangeNotifierProvider(create: (_) => ProfilProvider()),
         // jika nanti menggunakan provider untuk tasks secara global:
         // ChangeNotifierProvider(create: (_) => TasksProvider()),
       ],
@@ -50,6 +53,7 @@ class MyApp extends StatelessWidget {
         // optional: named route for TasksPage (handy)
         '/tasks': (context) => const TasksPage(),
         '/calendar': (context) => const CalendarPage(),
+        '/profil': (context) => const ProfilPage(),
       },
     );
   }

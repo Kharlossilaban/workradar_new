@@ -1,12 +1,9 @@
-// provider.dart
-// Provider untuk mengelola state kalender: focused/selected day, events, dan operasi CRUD sederhana.
-// Taruh file ini di: lib/features/tasks/providers/calendar_provider.dart
-
+// lib/features/tasks/providers/calendar_provider.dart
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
-// Model Event sederhana
+/// Model Event sederhana
 class Event {
   String title;
   TimeOfDay time;
@@ -26,16 +23,19 @@ class CalendarProvider extends ChangeNotifier {
   // Map tanggal (tanpa waktu) -> list event
   final Map<DateTime, List<Event>> _events = {};
 
-  // Konstruktor: inisialisasi locale & contoh event
   CalendarProvider() {
+    // inisialisasi locale (non-blocking)
     _initLocale();
     _initSampleEvents();
   }
 
-  // Inisialisasi lokal untuk formatting tanggal (id_ID)
   Future<void> _initLocale() async {
-    await initializeDateFormatting('id_ID', null);
-    Intl.defaultLocale = 'id_ID';
+    try {
+      await initializeDateFormatting('id_ID', null);
+      Intl.defaultLocale = 'id_ID';
+    } catch (e) {
+      // gagal inisialisasi locale — tidak fatal
+    }
     notifyListeners();
   }
 

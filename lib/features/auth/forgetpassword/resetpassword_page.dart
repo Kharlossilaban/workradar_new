@@ -6,7 +6,7 @@ import 'package:workradar/features/auth/forgetpassword/forgetpassword_provider.d
 
 /// Public page — bisa dipanggil dari luar, biarkan ada Key param (konvensi Flutter)
 class ResetPasswordPage extends StatelessWidget {
-  const ResetPasswordPage({Key? key}) : super(key: key);
+  const ResetPasswordPage({super.key});
 
   @override
   Widget build(BuildContext context) {

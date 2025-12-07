@@ -6,7 +6,7 @@ import 'package:workradar/features/auth/forgetpassword/forgetpassword_provider.d
 import 'package:workradar/features/auth/forgetpassword/forgetpassword_kodeotp.dart';
 
 class ResetPasswordPage extends StatelessWidget {
-  const ResetPasswordPage();
+  const ResetPasswordPage({super.key});
 
   @override
   Widget build(BuildContext context) {

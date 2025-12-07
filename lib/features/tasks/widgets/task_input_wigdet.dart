@@ -137,16 +137,20 @@ class _TaskInputWidgetState extends State<TaskInputWidget> {
 
   Future<void> _openDatePicker() async {
     DateTime now = DateTime.now();
-    final pick = widget.onPickDate != null
-        ? await widget.onPickDate!(context)
-        : await showDatePicker(
-            context: context,
-            initialDate: now,
-            firstDate: DateTime(now.year - 2),
-            lastDate: DateTime(now.year + 2),
-          );
+    DateTime? pick;
 
-    if (pick != null) setState(() => _selectedDate = pick);
+    if (widget.onPickDate != null) {
+      pick = await widget.onPickDate!(context);
+    } else {
+      pick = await showDatePicker(
+        context: context,
+        initialDate: now,
+        firstDate: DateTime(now.year - 2),
+        lastDate: DateTime(now.year + 2),
+      );
+    }
+
+    if (pick != null && mounted) setState(() => _selectedDate = pick);
   }
 
   void _submitTask() {

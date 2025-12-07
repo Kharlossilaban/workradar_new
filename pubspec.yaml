@@ -66,6 +66,7 @@ flutter:
     - assets/ulang_tahun.jpg
     - assets/kerja.jpg
     - assets/calendar.png
+    - assets/mybini.png
     - assets/icons/calendar.svg
     - assets/icons/home.svg
     - assets/icons/profile.svg
